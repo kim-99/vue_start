@@ -31,7 +31,7 @@ export default new Router({
           component:NewsList
         },
         {
-          path:'detail:id',
+          path:'detail/:id',
           name:'news detail',
           component:NewsDetail
         }
@@ -48,7 +48,7 @@ export default new Router({
           component:ProductList
         },
         {
-          path:'detail:id',
+          path:'detail/:id',
           name:'product detail',
           component:ProductDetail
         }
