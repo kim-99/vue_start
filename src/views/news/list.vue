@@ -3,7 +3,7 @@
       <div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<a href="##">首页</a>&gt;行业资讯</div>
         <ul class="news_list">
           <!-- <li><em>2013-3-08</em><a href="##" target="_blank">{{contentData.title}}</a></li> -->
-          <li v-for="(item,index) in listData" :key="item.id"><em>{{ parseDate(item.createDate) }}</em><router-link :to="'/news/detail/'+item.id">{{ item.title }}</router-link></li>
+          <li v-for="item in listData" :key="item.id"><em>{{ parseDate(item.createDate) }}</em><router-link :to="'/news/detail/'+item.id">{{ item.title }}</router-link></li>
         </ul>
         <div class="page">
           <!-- <a class="page_Cur" href="##">1</a>
@@ -31,7 +31,7 @@ export default {
 
       page:{
         total:0,
-        page:1,
+        page:1,//当前页
         pageNum:10,
       },
     }

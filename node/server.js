@@ -1,11 +1,42 @@
-let express = require('express'); //node的一个框架
-let bodyParser = require('body-parser'); //express的插件：数据整理
-let http = require('http'); //http对象， node内建对象
-let path = require('path'); //路径对象，node内建对象
-let app = express();
+var express = require('express'); //node的一个框架
+var bodyParser = require('body-parser'); //express的插件：数据整理
+var http = require('http'); //http对象， node内建对象
+var path = require('path'); //路径对象，node内建对象
+var app = express();
+var mysql=require('mysql'); //引入数据库
+
 // 建立静态资源访问
 app.use(express.static(path.join(__dirname, 'src')));
 app.use(bodyParser()); //使用此插件
+
+var pool=mysql.createPool({
+  host:'localhost',
+  user:'root',
+  password:'rootroot',
+  port:3306,
+  database:'yqz'
+});
+
+function mysqlQuery(sql,callback){
+  pool.getConnection((err,connection)=>{
+    if(err){
+      console.log(`数据库错误：${err}`);
+    }
+    else{
+      connection.query(sql,(err,result)=>{
+        connection.release();//释放连接
+        if(typeof callback == 'function'){
+          callback(result);
+        }
+      });
+    }
+  });
+}
+
+mysqlQuery('select*from yqz_news',(result)=>{//打印数据库中的数据
+  console.log(result);
+});
+
 app.get('/get/contact', function(require, response) {
     // console.log(typeof require.query, require.query);
     response.json({
@@ -104,7 +135,7 @@ app.get('/get/product/detail',function(require,response){
         msg: 'success',//错误消息
         data: {//响应数据
           title: '其他其他其他其他其他其他其他其他其他其他其他其他其他',
-          createDate: 1583547371000,
+          createDate: 1519055999000,
           content: `<p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他</p>
                 <p>其他其他其他其他其他其其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v他其他</p>
                 <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他</p>
@@ -183,7 +214,7 @@ app.get('/get/news/detail',function(require,response){
         msg: 'success',//错误消息
         data: {//响应数据
           title: '其他其他其他其他其他其他其他其他其他其他其他其他其他',
-          createDate: 1583547371000,
+          createDate: 1519055999000,
           content: `<p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他</p>
                 <p>其他其他其他其他其他其其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v他其他</p>
                 <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他</p>
@@ -193,28 +224,62 @@ app.get('/get/news/detail',function(require,response){
       });
     }
   });
-app.get('/get/index', function(require, response) {
-    // console.log(typeof require.query, require.query);
+  app.get('/get/index/introduce',function(require,response){
+    //console.log(typeof require.query,require.query);
     response.json({
-        code:0,//错误码
-        msg:'success',
-        data1:'<p>大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月</p>',
-        newsData: [
-            {id: 1, title: '的说法撒旦发射撒旦撒旦飒沓01'},
-            {id: 2, title: '的说法撒旦发射撒旦撒旦飒沓02'},
-            {id: 3, title: '的说法撒旦发射撒旦撒旦飒沓03'},
-            {id: 4, title: '的说法撒旦发射撒旦撒旦飒沓04'},
-            {id: 5, title: '的说法撒旦发射撒旦撒旦飒沓05'},
-            {id: 6, title: '的说法撒旦发射撒旦撒旦飒沓06'},
-        ],
-        productData:[
-            {id: 1, title: '产品电器F0000001号'},
-            {id: 2, title: '产品电器F0000002号'},
-            {id: 3, title: '产品电器F0000003号'},
-            {id: 4, title: '产品电器F0000004号'},
-        ],
+      code: 0,//错误码
+      msg: 'success',//错误消息
+      data: {
+        imgUrl: 'http://localhost:8088/upload/intr.jpg',
+        description: '大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月'
+      },
     });
-});
+  });
+  
+  app.get('/get/index/products',function(require,response){
+    //console.log(typeof require.query,require.query);
+    response.json({
+      code: 0,//错误码
+      msg: 'success',//错误消息
+      data: [
+        { id: 1, title: '产品电器F0000001', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
+        { id: 2, title: '产品电器F0000002', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
+        { id: 3, title: '产品电器F0000003', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
+        { id: 4, title: '产品电器F0000004', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
+        { id: 5, title: '产品电器F0000005', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
+      ],
+    });
+  });
+  
+  app.get('/get/index/img/news',function(require,response){
+    //console.log(typeof require.query,require.query);
+    response.json({
+      code: 0,//错误码
+      msg: 'success',//错误消息
+      data: [
+        { id: 1, createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg', title: 'news1'},
+        { id: 2, createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/intr.jpg', title: 'news2'},
+        { id: 3, createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/map.jpg', title: 'news3'},
+      ],
+    });
+  });
+  
+  app.get('/get/index/news',function(require,response){
+    //console.log(typeof require.query,require.query);
+    response.json({
+      code: 0,//错误码
+      msg: 'success',//错误消息
+      data: [
+        { id: 1, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓1'},
+        { id: 2, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓2'},
+        { id: 3, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓3'},
+        { id: 4, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓4'},
+        { id: 5, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓5'},
+        { id: 6, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓6'},
+      ],
+    });
+  });
+  
   
 http.createServer(app).listen(8088, function() {
     console.log('8088启动成功！');
