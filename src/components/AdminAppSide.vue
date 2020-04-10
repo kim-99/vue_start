@@ -1,6 +1,9 @@
 <template>
   <el-menu
       :default-active="indexActive"
+      class="el-menu-vertical-demo"
+      @open="handleOpen"
+      @close="handleClose"
       background-color="#545c64"
       text-color="#fff"
       active-text-color="#ffd04b">
@@ -21,13 +24,28 @@ export default {
       navData: [
         { to: '/admin/index', name: '首页' },
         { to: '/admin/news', name: '新闻资讯' },
-        { to: '/admin/products', name: '公司产品' },
+        { to: '/admin/product', name: '公司产品' },
         { to: '/admin/contact', name: '联系我们' },
       ],
 
       indexActive: '/admin/index',
     }
-  }
+  },
+  created(){
+    this.getIndexActive();
+  },
+  methods:{
+    getIndexActive(){//为了刷新时不跳转到首页定位
+      console.log(this.$route.path);
+      this.indexActive=this.$route.path;
+    },
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    }
+  },
 }
 </script>
 

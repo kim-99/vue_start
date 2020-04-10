@@ -1,6 +1,6 @@
 <template>
   <div class="list_right">
-      <div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<a href="##">首页</a>&gt;行业资讯</div>
+      <div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<router-link to='/'>首页</router-link>&gt;行业资讯</div>
         <ul class="news_list">
           <!-- <li><em>2013-3-08</em><a href="##" target="_blank">{{contentData.title}}</a></li> -->
           <li v-for="item in listData" :key="item.id"><em>{{ parseDate(item.createDate) }}</em><router-link :to="'/news/detail/'+item.id">{{ item.title }}</router-link></li>

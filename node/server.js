@@ -4,10 +4,15 @@ var http = require('http'); //http对象， node内建对象
 var path = require('path'); //路径对象，node内建对象
 var app = express();
 var mysql=require('mysql'); //引入数据库
+var moment = require('moment');//修改时间格式
+var fs = require('fs');//文件对象; node内置对象，用来操作文件
+var multipart = require('connect-multiparty');//文件上传的插件
 
 // 建立静态资源访问
 app.use(express.static(path.join(__dirname, 'src')));
 app.use(bodyParser()); //使用此插件
+app.use(bodyParser.urlencoded({extended: true}));
+
 
 var pool=mysql.createPool({
   host:'localhost',
@@ -33,198 +38,366 @@ function mysqlQuery(sql,callback){
   });
 }
 
-mysqlQuery('select*from yqz_news',(result)=>{//打印数据库中的数据
-  console.log(result);
-});
+// mysqlQuery('select*from yqz_news',(result)=>{//打印数据库中的数据
+//   console.log(result);
+// });
+var hostname = 'http://localhost:8088';
 
-app.get('/get/contact', function(require, response) {
-    // console.log(typeof require.query, require.query);
-    response.json({
-        code:0,//错误码
-        msg:'success',
-        data:{
-            address: '杭州下载区杭州下载区杭州下载区xxxx3-2-901',
-            officeTel: '0571-8890Xxxxx',
-            contactTel: '1360000000000',
-            postcode: '310000',
-            email: 'xxxxxxks@163.com',
+app.get('/get/product',function(require,response){
+  var page = require.query.page;
+  mysqlQuery(`select * from yqz_product limit ${(page-1)*8}, 8`,(result)=>{
+    if(result){
+      var data = result.map(item => { 
+        return {
+          id: item.id,
+          title: item.title,
+          createDate: item.createDate.getTime(),
+          content:item.content,
+          imgUrl: item.imgUrl == null ? null : hostname+item.imgUrl
         }
-    });
-});
-app.get('/get/product', function(require, response) {
-    // console.log(typeof require.query, require.query);
-    var page=require.query.page;
-    if(page==1){
-        response.json({
-            code:0,
-            msg:'success',
-            page:1,//当前页
-            total:39,
-            pageNum:8,
-            data:[
-                { id: 1, title: 'BK系列控制变压器01',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。'},
-                { id: 2, title: 'BK系列控制变压器02',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 3, title: 'BK系列控制变压器03',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 4, title: 'BK系列控制变压器04',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 5, title: 'BK系列控制变压器05',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 6, title: 'BK系列控制变压器06',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 7, title: 'BK系列控制变压器07',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 8, title: 'BK系列控制变压器08',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-            ],
-        });
-    }
-    else if(page == 2){
-        response.json({
-            code:0,
-            msg:'success',
-            page:2,//当前页
-            total:39,
-            pageNum:8,
-            data:[
-                { id: 11, title: 'BK系列控制变压器11',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。'},
-                { id: 12, title: 'BK系列控制变压器12',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 13, title: 'BK系列控制变压器13',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 14, title: 'BK系列控制变压器14',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 15, title: 'BK系列控制变压器15',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 16, title: 'BK系列控制变压器16',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 17, title: 'BK系列控制变压器17',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 18, title: 'BK系列控制变压器18',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-            ],
-        });
+      });
+
+      mysqlQuery(`select id from yqz_product`,(idArr)=>{
+        if(idArr){
+          var total = idArr.length
+          response.json({
+            code: 0,//错误码
+            msg: 'success',//错误消息
+            total,//数据总量
+            page,//当前页是1,
+            pageNum: 8,//每页是10个
+            data,
+          });
+        }
+        else{
+          res.json({ code: -1, msg: 'failed', data: [] });//给前端响应信息
+        }
+      });
     }
     else{
-        response.json({
-            code:0,
-            msg:'success',
-            page:3,//当前页
-            total:39,
-            pageNum:8,
-            data:[
-                { id: 21, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。'},
-                { id: 22, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 23, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 24, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 25, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 26, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 27, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-                { id: 28, title: 'BK系列控制变压器',  description: '适用范围：BK系列控制变压器适用于50Hz-60Hz的交流电路中，通常用作机床控制电器局部照明灯及指示灯的电源中。' },
-            ],
-        });
+      res.json({ code: -1, msg: 'failed', data: [] });//给前端响应信息
     }
+  });
+});
+app.post('/post/product/add',(req,res) =>{
+  var title = req.body.title;
+  var content = req.body.content;
+  //console.log(title,content)
+  var createDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+  mysqlQuery(`insert into yqz_product (title,content,createDate) value ("${title.replace(/\"/g,"\\\"")}","${content.replace(/\"/g,"\\\"")}","${createDate}")`,(result)=>{ //最好写成模板字符串
+    //console.log(result)
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  });
+});
+app.delete('/delete/product',(req,res) =>{
+  var id = req.query.id;
+  mysqlQuery(`delete from yqz_product where id=${id}`,(result)=>{
+    //console.log(result);
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  })
+});
+app.put('/put/product',(req,res) =>{
+  var id = req.body.id;
+  var title = req.body.title;
+  var content = req.body.content;
+  var createDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+  console.log(title,content,createDate)
+  mysqlQuery(`update yqz_product set title="${title.replace(/\"/g,"\\\"")}",content="${content.replace(/\"/g,"\\\"")}",createDate="${createDate}" where id=${id}`,(result,err)=>{
+    console.log(result,err);
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  })
 });
 app.get('/get/product/detail',function(require,response){
-    //console.log(typeof require.query,require.query);
-    if(require.query.id == 1){
+  //console.log(typeof require.query,require.query);
+  var id = require.query.id;
+  mysqlQuery(`select * from yqz_product where id=${id}`,(result)=>{
+    if(result){
+      var data = result.map(item => { 
+        return {
+          id: item.id,
+          title: item.title,
+          createDate: item.createDate.getTime(),
+          content: item.content,
+          imgUrl: item.imgUrl == null ? null : hostname+item.imgUrl
+        }
+      })[0];
       response.json({
         code: 0,//错误码
         msg: 'success',//错误消息
-        data: {//响应数据
-          title: '公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介',
-          createDate: 1519055999000,
-          content: `<p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>`
-        },
+        data,
       });
     }
     else{
-      response.json({
-        code: 0,//错误码
-        msg: 'success',//错误消息
-        data: {//响应数据
-          title: '其他其他其他其他其他其他其他其他其他其他其他其他其他',
-          createDate: 1519055999000,
-          content: `<p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他</p>
-                <p>其他其他其他其他其他其其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v其他其他其他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v其他</p>`
-        },
-      });
+      res.json({ code: -1, msg: 'failed', data: null });//给前端响应信息
     }
   });
-app.get('/get/news', function(require, response) {
-    // console.log(typeof require.query, require.query);
-    var page=require.query.page;
-    if(page==1){
-        response.json({
-            code:0,
-            msg:'success',
-            page:1,//当前页
-            total:59,
-            pageNum:10,
-            data:[
-                { id: 1, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0001', createDate: 1519055999000 },
-                { id: 2, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0002', createDate: 1519055999000 },
-                { id: 3, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0003', createDate: 1519055999000 },
-                { id: 4, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0004', createDate: 1519055999000 },
-                { id: 5, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0005', createDate: 1519055999000 },
-                { id: 6, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0006', createDate: 1519055999000 },
-                { id: 7, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0007', createDate: 1519055999000 },
-                { id: 8, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0008', createDate: 1519055999000 },
-                { id: 9, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0009', createDate: 1519055999000 },
-                { id: 10, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0010', createDate: 1519055999000 },
-            ],
+});
+var multipartMiddleware = multipart();
+app.put('/put/product/img',multipartMiddleware,(req,res) =>{
+  var id = req.body.id;
+  var frontPath = req.files.file.path; //前端文件的地址
+  var newPath = path.resolve(__dirname,'./src/upload',req.files.file.originalFilename);//resolve把__dirname,和'./src/upload'地址拼接起来
+  fs.readFile(frontPath, function (err, data) {  //读取前端数据地址
+      if (err){
+        res.json({ code: -1, msg: 'failed', data: false });
+        return;
+      };
+      //console.log('File read!');
+
+      // Write the file-写入后台的地址
+      fs.writeFile(newPath, data, function (err) {//data是buffer缓冲区二进制数据 ///写一个储存路径。
+          if (err){
+            res.json({ code: -1, msg: 'failed', data: false });
+          }
+          else{
+            mysqlQuery(`update yqz_product set imgUrl="${'/upload/'+req.files.file.originalFilename}" where id=${id}`,(result,err)=>{
+              console.log(result,err);
+              if(result){
+                res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+              }
+              else{
+                res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+              }
+            });
+          }
+      });
+
+      // Delete the file临时文件地址
+      fs.unlink(frontPath, function (err) {
+          if (err) throw err;
+          //console.log('File deleted!');
+      });
+  });
+  
+});
+
+
+app.get('/get/news',function(require,response){
+    //console.log(typeof require.query,require.query);
+    var page = require.query.page;
+    //select * from 表名 limit 跳过的数据,取几条
+    mysqlQuery(`select * from yqz_news limit ${(page-1)*10}, 10`,(result)=>{
+      if(result){
+        var data = result.map(item => { 
+          return {
+            id: item.id,
+            title: item.title,
+            createDate: item.createDate.getTime(),
+            imgUrl: item.imgUrl == null ? null : hostname+item.imgUrl
+          }
         });
-    }
-    else if(page == 2){
-        response.json({
-          code: 0,//错误码
-          msg: 'success',//错误消息
-          total: 59,//数据总量
-          page: 2,//当前页是1,
-          pageNum: 10,//每页是10个
-          data: [
-            { id: 11, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0011', createDate: 1519055999000 },
-            { id: 12, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0012', createDate: 1519055999000 },
-            { id: 13, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0013', createDate: 1519055999000 },
-            { id: 14, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0014', createDate: 1519055999000 },
-            { id: 15, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0015', createDate: 1519055999000 },
-            { id: 16, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0016', createDate: 1519055999000 },
-            { id: 17, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0017', createDate: 1519055999000 },
-            { id: 18, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0018', createDate: 1519055999000 },
-            { id: 19, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0019', createDate: 1519055999000 },
-            { id: 20, title: '江西大于xxxxx深加工产业基地江西大于xxxxx深加工产业基地江西大于0020', createDate: 1519055999000 },
-          ],
+  
+        mysqlQuery(`select id from yqz_news`,(idArr)=>{
+          if(idArr){
+            var total = idArr.length
+            response.json({
+              code: 0,//错误码
+              msg: 'success',//错误消息
+              total,//数据总量
+              page,//当前页是1,
+              pageNum: 10,//每页是10个
+              data,
+            });
+          }
+          else{
+            res.json({ code: -1, msg: 'failed', data: [] });//给前端响应信息
+          }
         });
       }
+      else{
+        res.json({ code: -1, msg: 'failed', data: [] });//给前端响应信息
+      }
+    });
+});
+app.post('/post/news/add',(req,res) =>{
+  var title = req.body.title;
+  var content = req.body.content;
+  //console.log(title,content)
+  var createDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+  mysqlQuery(`insert into yqz_news (title,content,createDate) value ("${title.replace(/\"/g,"\\\"")}","${content.replace(/\"/g,"\\\"")}","${createDate}")`,(result)=>{ //最好写成模板字符串
+    //console.log(result)
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  });
+});
+app.delete('/delete/news',(req,res) =>{
+  var id = req.query.id;
+  mysqlQuery(`delete from yqz_news where id=${id}`,(result)=>{
+    //console.log(result);
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  })
+});
+app.put('/put/news',(req,res) =>{
+  var id = req.body.id;
+  var title = req.body.title;
+  var content = req.body.content;
+  var createDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+  console.log(title,content,createDate)
+  mysqlQuery(`update yqz_news set title="${title.replace(/\"/g,"\\\"")}",content="${content.replace(/\"/g,"\\\"")}",createDate="${createDate}" where id=${id}`,(result,err)=>{
+    console.log(result,err);
+    if(result){
+      res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+    }
+    else{
+      res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+    }
+  })
 });
 app.get('/get/news/detail',function(require,response){
-    //console.log(typeof require.query,require.query);
-    if(require.query.id == 1){
+  //console.log(typeof require.query,require.query);
+  var id = require.query.id;
+  mysqlQuery(`select * from yqz_news where id=${id}`,(result)=>{
+    if(result){
+      var data = result.map(item => { 
+        return {
+          id: item.id,
+          title: item.title,
+          createDate: item.createDate.getTime(),
+          content: item.content,
+          imgUrl: item.imgUrl == null ? null : hostname+item.imgUrl
+        }
+      })[0];
       response.json({
         code: 0,//错误码
         msg: 'success',//错误消息
-        data: {//响应数据
-          title: '公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介',
-          createDate: 1519055999000,
-          content: `<p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>
-                <p>江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介，江西大余县公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介。</p>`
-        },
+        data,
       });
     }
     else{
+      res.json({ code: -1, msg: 'failed', data: null });//给前端响应信息
+    }
+  });
+});
+//上传接口
+var multipartMiddleware = multipart();
+app.put('/put/news/img',multipartMiddleware,(req,res) =>{
+  var id = req.body.id;
+  var frontPath = req.files.file.path; //前端文件的地址
+  var newPath = path.resolve(__dirname,'./src/upload',req.files.file.originalFilename);//resolve把__dirname,和'./src/upload'地址拼接起来
+  fs.readFile(frontPath, function (err, data) {  //读取前端数据地址
+      if (err){
+        res.json({ code: -1, msg: 'failed', data: false });
+        return;
+      };
+      //console.log('File read!');
+
+      // Write the file-写入后台的地址
+      fs.writeFile(newPath, data, function (err) {//data是buffer缓冲区二进制数据 ///写一个储存路径。
+          if (err){
+            res.json({ code: -1, msg: 'failed', data: false });
+          }
+          else{
+            mysqlQuery(`update yqz_news set imgUrl="${'/upload/'+req.files.file.originalFilename}" where id=${id}`,(result,err)=>{
+              console.log(result,err);
+              if(result){
+                res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+              }
+              else{
+                res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+              }
+            });
+          }
+      });
+
+      // Delete the file临时文件地址
+      fs.unlink(frontPath, function (err) {
+          if (err) throw err;
+          //console.log('File deleted!');
+      });
+  });
+  
+});
+app.get('/get/contact',function(require,response){
+  mysqlQuery(`select * from yqz_contact where id=1`,(result)=>{
+    if(result){
+      var data = result.map(item => { 
+        return {
+          imgUrl: hostname + item.imgUrl,
+          address: item.address,
+          officeTel: item.officeTel,
+          contactTel: item.contactTel,
+          postcode:item.postcode,
+          email:item.email,
+        }
+      })[0];
       response.json({
         code: 0,//错误码
         msg: 'success',//错误消息
-        data: {//响应数据
-          title: '其他其他其他其他其他其他其他其他其他其他其他其他其他',
-          createDate: 1519055999000,
-          content: `<p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他</p>
-                <p>其他其他其他其他其他其其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他vv其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v其他其他其他其他</p>
-                <p>其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他其他v其他</p>`
-        },
+        data,
       });
     }
+    else{
+      res.json({ code: -1, msg: 'failed', data: [] });//给前端响应信息
+    }
   });
-  app.get('/get/index/introduce',function(require,response){
+});
+app.put('/put/contact', multipartMiddleware, (req,res) =>{
+  console.log(req.body)
+  var address = req.body.address;
+  var officeTel = req.body.officeTel;
+  var contactTel = req.body.contactTel;
+  var postcode = req.body.postcode;
+  var email = req.body.email;
+  var frontPath = req.files.file.path; //后端拿到的文件临时地址
+  var newPath = path.resolve(__dirname,'./src/upload',req.files.file.originalFilename);
+
+  fs.readFile(frontPath, function (err, data) {
+    if (err){res.json({ code: -1, msg: 'failed', data: false });
+      return;
+    };
+    //console.log('File read!');
+
+    // Write the file-写入后台的地址
+    fs.writeFile(newPath, data, function (err) {//data是buffer缓冲区二进制数据
+        if (err){
+          res.json({ code: -1, msg: 'failed', data: false });
+        }
+        else{
+          mysqlQuery(`update yqz_contact set imgUrl="${'/upload/'+req.files.file.originalFilename}",address="${address}",officeTel="${officeTel}",contactTel="${contactTel}",postcode="${postcode}",email="${email}" where id=1`,(result,err)=>{
+            console.log(result,err);
+            if(result){
+              res.json({ code: 0, msg: 'success', data: true });//给前端响应信息
+            }
+            else{
+              res.json({ code: -1, msg: 'failed', data: false });//给前端响应信息
+            }
+          });
+        }
+    });
+
+    // Delete the file临时文件地址
+    fs.unlink(frontPath, function (err) {
+        if (err) throw err;
+        //console.log('File deleted!');
+    });
+  });
+});
+
+app.get('/get/index/introduce',function(require,response){
     //console.log(typeof require.query,require.query);
     response.json({
       code: 0,//错误码
@@ -234,9 +407,8 @@ app.get('/get/news/detail',function(require,response){
         description: '大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月，大余县xxxxxx公司城里于2002年9月'
       },
     });
-  });
-  
-  app.get('/get/index/products',function(require,response){
+});
+app.get('/get/index/products',function(require,response){
     //console.log(typeof require.query,require.query);
     response.json({
       code: 0,//错误码
@@ -249,9 +421,8 @@ app.get('/get/news/detail',function(require,response){
         { id: 5, title: '产品电器F0000005', createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/1.jpg'},
       ],
     });
-  });
-  
-  app.get('/get/index/img/news',function(require,response){
+});
+app.get('/get/index/img/news',function(require,response){
     //console.log(typeof require.query,require.query);
     response.json({
       code: 0,//错误码
@@ -262,9 +433,8 @@ app.get('/get/news/detail',function(require,response){
         { id: 3, createDate: 1519055999000, imgUrl: 'http://localhost:8088/upload/map.jpg', title: 'news3'},
       ],
     });
-  });
-  
-  app.get('/get/index/news',function(require,response){
+});
+app.get('/get/index/news',function(require,response){
     //console.log(typeof require.query,require.query);
     response.json({
       code: 0,//错误码
@@ -278,7 +448,7 @@ app.get('/get/news/detail',function(require,response){
         { id: 6, createDate: 1519055999000, title: '的说法撒旦发射撒旦撒旦飒沓6'},
       ],
     });
-  });
+});
   
   
 http.createServer(app).listen(8088, function() {

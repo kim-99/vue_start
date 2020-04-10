@@ -8,49 +8,58 @@ import ProductIndex from '@/views/product/index'
 import ProductList from '@/views/product/list'
 import ProductDetail from '@/views/product/detail'
 import Contact from '@/views/contact'
+import Admin from '@/admin/admin'
+import AdminIndex from '@/admin/index/index'
+import AdminNews from '@/admin/news/index'
+import AdminNewsAdd from '@/admin/news/add'
+import AdminNewsEdit from '@/admin/news/edit'
+import AdminProduct from '@/admin/product/index'
+import AdminProductAdd from '@/admin/product/add'
+import AdminProductEdit from '@/admin/product/edit'
+import AdminContact from '@/admin/contact/index'
 
 
 Vue.use(Router)
 
 export default new Router({
-  mode:'history',
+  mode: 'history',
   routes: [
-    {
+    {//配置一个路由
       path: '/',
       name: 'index',
       component: Index
     },
-    {
-      path:'/news',
-      name:'news',
-      component:NewsIndex,
-      children:[
-        {
-          path:'list',
-          name:'news list',
-          component:NewsList
+    {//配置一个路由
+      path: '/news',
+      name: 'news',
+      component: NewsIndex,
+      children: [
+        {//配置一个路由
+          path: 'list',
+          name: 'news list',
+          component: NewsList
         },
-        {
-          path:'detail/:id',
-          name:'news detail',
-          component:NewsDetail
+        {//配置一个路由
+          path: 'detail/:id',
+          name: 'news detail',
+          component: NewsDetail
         }
       ]
     },
-    {
-      path:'/product',
-      name:'products',
-      component:ProductIndex,
-      children:[
-        {
-          path:'list',
-          name:'product list',
-          component:ProductList
+    {//配置一个路由
+      path: '/product',
+      name: 'product',
+      component: ProductIndex,
+      children: [
+        {//配置一个路由
+          path: 'list',
+          name: 'product list',
+          component: ProductList
         },
-        {
-          path:'detail/:id',
-          name:'product detail',
-          component:ProductDetail
+        {//配置一个路由
+          path: 'detail/:id',
+          name: 'product detail',
+          component: ProductDetail
         }
       ]
     },
@@ -59,5 +68,54 @@ export default new Router({
       name: 'contact',
       component: Contact
     },
+      
+    {//后台路由
+      path: '/admin',
+      name: 'admin',
+      component: Admin,
+      children: [
+        {//配置一个路由
+          path: 'index',
+          name: 'admin index',
+          component: AdminIndex
+        },
+        {//配置一个路由
+          path: 'news',
+          name: 'admin news',
+          component: AdminNews,
+        },
+        {//配置一个路由
+          path: 'news/add',
+          name: 'admin news add',
+          component: AdminNewsAdd,
+        },
+        {//配置一个路由
+          path: 'news/edit/:id',
+          name: 'admin news edit',
+          component: AdminNewsEdit,
+        },
+
+        {//配置一个路由
+          path: 'product',
+          name: 'admin product',
+          component: AdminProduct,
+        },
+        {//配置一个路由
+          path: 'product/add',
+          name: 'admin product add',
+          component: AdminProductAdd,
+        },
+        {//配置一个路由
+          path: 'product/edit/:id',
+          name: 'admin product edit',
+          component: AdminProductEdit,
+        },     
+        {//配置一个路由
+          path: 'contact',
+          name: 'admin contact',
+          component: AdminContact,
+        },    
+      ]
+    }
   ]
 })

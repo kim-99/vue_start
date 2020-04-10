@@ -1,6 +1,6 @@
 <template>
   <div class="list_right">
-      <div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<a href="##">首页</a>&gt;产品列表</div>
+      <div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<router-link to='/'>首页</router-link>&gt;产品列表</div>
         <div class="product">
           <!-- <dl>
               <dt><a href="##"><img src="@/assets/img/1.jpg" width="125" height="125" alt="产品" /></a></dt>
@@ -10,10 +10,10 @@
                 </dd>
             </dl> -->
             <dl v-for="item in listData" :key="item.id">
-                <dt><a href="##"><img src="@/assets/img/1.jpg" width="125" height="125" alt="产品" /></a></dt>
+                <dt><a href="##"><img :src="item.imgUrl" width="125" height="125" alt="产品" /></a></dt>
                 <dd>
                 	<h4><router-link :to="'/product/detail/' + item.id">{{ item.title }}</router-link></h4>
-                    <p>{{item.description}}</p>
+                    <p>{{item.content}}</p>
                 </dd>
             </dl>
 

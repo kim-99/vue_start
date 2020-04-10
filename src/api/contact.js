@@ -4,3 +4,6 @@ export function getContact(oParams) {
         params: oParams.params
     });
 };
+export function putContact(oParams){
+    return require.put('/put/contact', oParams.data);
+};

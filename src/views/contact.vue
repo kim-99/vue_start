@@ -1,9 +1,9 @@
 <template>
     <div class="list_right">
-    	<div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<a href="##">首页</a>&gt;联系我们</div>
+    	<div class="list_tit"><span><i>◆</i></span>您现在所在的位置：<router-link to='/'>首页</router-link>&gt;联系我们</div>
         <div class="contact">
         	<h2>联系我们</h2>
-            <span class="contact_map"><img src="@/assets/img/map.jpg" width="532" height="245" alt="地址" /></span>
+            <span class="contact_map"><img :src="contentData.imgUrl"  width="532" height="245" alt="地址" /></span>
             <ul class="contact_main">
             	  <li>联系地址：{{contentData.address}}</li>
                 <li>办公电话：{{contentData.officeTel}}</li>

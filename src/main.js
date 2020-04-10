@@ -4,10 +4,15 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
-import ElementUI from 'element-ui'; //ui框架
+import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+import 'vue-simple-ueditor/dist/css/vue-ueditor.css';
+import VueUEditor from 'vue-simple-ueditor';
+
 Vue.use(ElementUI);
+
+Vue.use(VueUEditor);
 
 Vue.config.productionTip = false
 
